@@ -3,19 +3,12 @@ fn first_test() {
     assert_eq!(solution1("(())"), 0);
     assert_eq!(solution1("()()"), 0);
 }
-#[allow(unused)]
 fn solution1(input: &str) -> isize {
-    let chars: Vec<_> = input.chars().collect();
-    // println!("{chars:?}");
-    let mut floor = 0;
-    for ch in chars {
-        match ch {
-            '(' => floor += 1,
-            ')' => floor -= 1,
-            _ => {}
-        };
-    }
-    floor
+    input.chars().fold(0, |floor, ch| match ch {
+        '(' => floor + 1,
+        ')' => floor - 1,
+        _ => floor,
+    })
 }
 fn solution2(input: &str) -> usize {
     let mut floor: isize = 0;
@@ -36,5 +29,6 @@ fn main() {
 
     //println!("{input}");
 
+    println!("{}", solution1(&input));
     println!("{}", solution2(&input));
 }
