@@ -7,28 +7,26 @@ fn first_test() {
 fn solution1(input: &str) -> isize {
     let chars: Vec<_> = input.chars().collect();
     // println!("{chars:?}");
-    let mut floor=0;
+    let mut floor = 0;
     for ch in chars {
         match ch {
-            '(' => floor+=1,
-            ')' => floor-=1,
-            _=>{}
+            '(' => floor += 1,
+            ')' => floor -= 1,
+            _ => {}
         };
     }
     floor
 }
 fn solution2(input: &str) -> usize {
-    let mut floor:isize=0;
-    for (i, ch) in 
-    input.chars()
-.enumerate() {
+    let mut floor: isize = 0;
+    for (i, ch) in input.chars().enumerate() {
         match ch {
-            '(' => floor+=1,
-            ')' => floor-=1,
-            _=>{}
+            '(' => floor += 1,
+            ')' => floor -= 1,
+            _ => {}
         };
         if floor == -1 {
-            return i+1;
+            return i + 1;
         }
     }
     unreachable!("incorrect input")
@@ -40,8 +38,3 @@ fn main() {
 
     println!("{}", solution2(&input));
 }
-
-
-
-
- 
