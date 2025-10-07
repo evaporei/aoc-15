@@ -3,7 +3,7 @@ fn first_test() {
     assert_eq!(solution1("(())"), 0);
     assert_eq!(solution1("()()"), 0);
 }
-
+#[allow(unused)]
 fn solution1(input: &str) -> isize {
     let chars: Vec<_> = input.chars().collect();
     // println!("{chars:?}");
