@@ -26,6 +26,24 @@ fn solution1(input: &str) -> usize {
     )
 }
 
+fn solution2(input: &str) -> usize {
+    parse_presents(input).fold(
+        0,
+        |total,
+         Present {
+             length,
+             width,
+             height,
+         }| {
+            let mut dims = [length, width, height];
+            dims.sort();
+            let perimeter = 2 * (dims[0] + dims[1]);
+            let cubic = length * width * height;
+            total + perimeter + cubic
+        },
+    )
+}
+
 fn parse_presents(input: &str) -> impl Iterator<Item = Present> {
     input.lines().map(|line| {
         let mut dims = line.split('x');
@@ -39,4 +57,5 @@ fn parse_presents(input: &str) -> impl Iterator<Item = Present> {
 fn main() {
     let input = std::fs::read_to_string("input").unwrap();
     println!("{}", solution1(&input));
+    println!("{}", solution2(&input));
 }
