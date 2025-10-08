@@ -1,23 +1,39 @@
 use std::collections::HashMap;
 
+type Position = (isize, isize);
+
+struct Santa {
+    pos: Position,
+    map: HashMap<Position, usize>,
+}
+impl Santa {
+    fn new() -> Self {
+        let pos = (0, 0);
+        let mut map = HashMap::new();
+        map.insert(pos, 1);
+        Self { pos, map }
+    }
+    fn move_(&mut self, dir: char) {
+        let (x, y) = self.pos;
+        let new_pos = match dir {
+            '>' => (x + 1, y),
+            '<' => (x - 1, y),
+            '^' => (x, y + 1),
+            'v' => (x, y - 1),
+            _ => (x, y),
+        };
+        self.map.entry(new_pos).and_modify(|e| *e += 1).or_insert(1);
+        self.pos = new_pos;
+    }
+}
 fn solution1(input: &str) -> usize {
-    let start_pos = (0, 0);
-    let mut start_map = HashMap::new();
-    start_map.insert(start_pos, 1);
     input
         .chars()
-        .fold((start_pos, start_map), |((x, y), mut map), dir| {
-            let new_pos = match dir {
-                '>' => (x + 1, y),
-                '<' => (x - 1, y),
-                '^' => (x, y + 1),
-                'v' => (x, y - 1),
-                _ => (x, y),
-            };
-            map.entry(new_pos).and_modify(|e| *e += 1).or_insert(1);
-            (new_pos, map)
+        .fold(Santa::new(), |mut santa, dir| {
+            santa.move_(dir);
+            santa
         })
-        .1
+        .map
         .len()
 }
 fn main() {
