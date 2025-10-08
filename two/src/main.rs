@@ -1,18 +1,39 @@
 #[test]
-fn test_solution1(){
-    assert_eq!(solution1("2x3x4"),58);
+fn test_solution1() {
+    assert_eq!(solution1("2x3x4"), 58);
 }
+struct Present {
+    length: usize,
+    width: usize,
+    height: usize,
+}
+
 fn solution1(input: &str) -> usize {
-    input.lines().fold(0, |total, line| {
+    parse_presents(input).fold(
+        0,
+        |total,
+         Present {
+             length,
+             width,
+             height,
+         }| {
+            let area1 = length * width;
+            let area2 = width * height;
+            let area3 = height * length;
+            let area = 2 * (area1 + area2 + area3);
+            total + area + area1.min(area2).min(area3)
+        },
+    )
+}
+
+fn parse_presents(input: &str) -> impl Iterator<Item = Present> {
+    input.lines().map(|line| {
         let mut dims = line.split('x');
-        let length = dims.next().unwrap().parse::<usize>().unwrap();
-        let width = dims.next().unwrap().parse::<usize>().unwrap();
-        let height = dims.next().unwrap().parse::<usize>().unwrap();
-        let area1 = length * width;
-        let area2 = width * height;
-        let area3 = height * length;
-        let area = 2 * (area1 + area2 + area3);
-        total + area + area1.min(area2).min(area3)
+        Present {
+            length: dims.next().unwrap().parse::<usize>().unwrap(),
+            width: dims.next().unwrap().parse::<usize>().unwrap(),
+            height: dims.next().unwrap().parse::<usize>().unwrap(),
+        }
     })
 }
 fn main() {
