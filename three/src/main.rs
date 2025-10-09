@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 type Position = (isize, isize);
 
@@ -36,7 +36,24 @@ fn solution1(input: &str) -> usize {
         .map
         .len()
 }
+fn solution2(input: &str) -> usize {
+    let (santa, robo) = input.chars().enumerate().fold(
+        (Santa::new(), Santa::new()),
+        |(mut santa, mut robo), (i, dir)| {
+            if i % 2 == 0 {
+                santa.move_(dir);
+            } else {
+                robo.move_(dir);
+            }
+            (santa, robo)
+        },
+    );
+    let s: HashSet<Position> = santa.map.keys().copied().collect();
+    let r: HashSet<Position> = robo.map.keys().copied().collect();
+    s.union(&r).count()
+}
 fn main() {
     let input = std::fs::read_to_string("input").unwrap();
     println!("{}", solution1(&input));
+    println!("{}", solution2(&input));
 }
