@@ -4,13 +4,16 @@ fn first() {
 }
 fn solution1(input: &str) -> usize {
     for n in 0..std::usize::MAX {
-        let attempt = md5::compute(format!("{input}{n}"));
-        let result = format!("{attempt:x}");
-        if result.starts_with("00000") {
+        if hash(format!("{input}{n}")).starts_with("00000") {
             return n;
         }
     }
     unreachable!("not found")
+}
+
+fn hash(s: String) -> String {
+    let digest = md5::compute(s);
+    format!("{digest:x}")
 }
 fn main() {
     let input = std::fs::read_to_string("input").unwrap();
