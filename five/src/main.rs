@@ -25,26 +25,26 @@ fn solution1(input: &str) -> usize {
 }
 fn solution2(input: &str) -> usize {
     fn is_nice(s: &str) -> bool {
-        let mut it = s.chars().enumerate().peekable();
         let mut m = HashMap::new();
-        while let Some((i, ch)) = it.next() {
-            if let Some((_i2, ch2)) = it.peek() {
-                m.entry((ch, *ch2))
-                    .and_modify(|e: &mut Vec<_>| e.push(i))
-                    .or_insert(vec![i]);
+        let mut one_letter = false;
+        let bytes = s.as_bytes();
+        for (i, triple) in bytes.windows(3).enumerate() {
+            if triple[0] == triple[2] {
+                one_letter = true;
             }
+            m.entry((triple[0], triple[1]))
+                .and_modify(|e: &mut Vec<_>| e.push(i))
+                .or_insert(vec![i]);
         }
+        let penultimate = bytes.len() - 2;
+        m.entry((bytes[penultimate], bytes[penultimate + 1]))
+            .and_modify(|e: &mut Vec<_>| e.push(penultimate))
+            .or_insert(vec![penultimate]);
         let mut has_pair = false;
         for indices in m.values() {
             if indices.windows(2).any(|pair| pair[1] - pair[0] > 1) {
                 has_pair = true;
                 break;
-            }
-        }
-        let mut one_letter = false;
-        for triple in s.as_bytes().windows(3) {
-            if triple[0] == triple[2] {
-                one_letter = true;
             }
         }
         has_pair && one_letter
