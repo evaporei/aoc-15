@@ -10,6 +10,14 @@ fn solution1(input: &str) -> usize {
     }
     unreachable!("not found")
 }
+fn solution2(input: &str) -> usize {
+    for n in 0..std::usize::MAX {
+        if hash(format!("{input}{n}")).starts_with("000000") {
+            return n;
+        }
+    }
+    unreachable!("not found")
+}
 
 fn hash(s: String) -> String {
     let digest = md5::compute(s);
@@ -18,4 +26,5 @@ fn hash(s: String) -> String {
 fn main() {
     let input = std::fs::read_to_string("input").unwrap();
     println!("{}", solution1(&input.trim()));
+    println!("{}", solution2(&input.trim()));
 }
