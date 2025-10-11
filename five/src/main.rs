@@ -40,13 +40,10 @@ fn solution2(input: &str) -> usize {
         m.entry((bytes[penultimate], bytes[penultimate + 1]))
             .and_modify(|e: &mut Vec<_>| e.push(penultimate))
             .or_insert(vec![penultimate]);
-        let mut has_pair = false;
-        for indices in m.values() {
-            if indices.windows(2).any(|pair| pair[1] - pair[0] > 1) {
-                has_pair = true;
-                break;
-            }
-        }
+        let has_pair = m
+            .values()
+            .flat_map(|indices| indices.windows(2))
+            .any(|pair| pair[1] - pair[0] > 1);
         has_pair && one_letter
     }
     input.lines().filter(|s| is_nice(s)).count()
