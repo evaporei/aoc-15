@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn solution1(input: &str) -> usize {
     fn is_nice(s: &str) -> bool {
         let mut it = s.chars().peekable();
@@ -21,7 +23,43 @@ fn solution1(input: &str) -> usize {
     }
     input.lines().filter(|s| is_nice(s)).count()
 }
+fn solution2(input: &str) -> usize {
+    fn is_nice(s: &str) -> bool {
+        let mut it = s.chars().enumerate().peekable();
+        let mut m = HashMap::new();
+        let mut m2 = HashMap::new();
+        while let Some((i, ch)) = it.next() {
+            m.entry(ch)
+                .and_modify(|e: &mut Vec<_>| e.push(i))
+                .or_insert(vec![i]);
+            if let Some((_i2, ch2)) = it.peek() {
+                m2.entry((ch, *ch2))
+                    .and_modify(|e: &mut Vec<_>| e.push(i))
+                    .or_insert(vec![i]);
+            }
+        }
+        let mut one_letter = false;
+        for indices in m.values() {
+            if indices.windows(2).any(|pair| pair[1] - pair[0] == 2)
+                || indices.windows(3).any(|triple| triple[2] - triple[0] == 2)
+            {
+                one_letter = true;
+                break;
+            }
+        }
+        let mut has_pair = false;
+        for indices in m2.values() {
+            if indices.windows(2).any(|pair| pair[1] - pair[0] > 1) {
+                has_pair = true;
+                break;
+            }
+        }
+        one_letter && has_pair
+    }
+    input.lines().filter(|s| is_nice(s)).count()
+}
 fn main() {
     let input = std::fs::read_to_string("input").unwrap();
-    println!("{}", solution1(&input.trim()));
+    println!("{}", solution1(&input));
+    println!("{}", solution2(&input));
 }
