@@ -1,8 +1,10 @@
-(defvar grid-size 1000)
-(defvar grid
-  (vconcat
-   (cl-loop repeat grid-size
-            collect (make-vector grid-size 0))))
+(defvar grid-size 0)
+(defvar grid nil)
+(setq grid-size 1000)
+(setq grid
+      (vconcat
+       (cl-loop repeat grid-size
+                collect (make-vector grid-size 0))))
 (defun grid-set (i j light)
   (aset (aref grid i) j (max 0 (+ (grid-get i j) light))))
 (defun grid-get (i j)
@@ -78,5 +80,11 @@
 ;;   (process-command cmd))
 
 (defvar input-file "./input")
+(defvar nowvar nil)
+(setq nowvar (current-time))
 (run-each-line input-file 'process-command)
+(defvar elapsed nil)
+(setq elapsed
+      (float-time (time-subtract (current-time) nowvar)))
+(message "done in (%.3fs)" elapsed)
 (message "total brightness: %d" (total-brightness))
