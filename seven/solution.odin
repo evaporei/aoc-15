@@ -1,10 +1,8 @@
 package seven
 import ts "core:container/topological_sort"
-import "core:mem"
 import "core:strconv"
 
 import "core:fmt"
-import "core:os"
 import "core:strings"
 
 Signal :: u16
@@ -32,22 +30,18 @@ LShift :: distinct Binary
 Ast :: map[Wire]Val
 MAX_LINE_SIZE :: 18
 main :: proc() {
-	input := #load("example", string)
+	input := #load("input", string)
 	ast := make(Ast)
 	sorter: ts.Sorter(string)
 	ts.init(&sorter)
 
-	// TODO: use stack
-	scratch: mem.Scratch
-	mem.scratch_init(&scratch, size_of(rune) * MAX_LINE_SIZE * 2)
 	for line in strings.split_lines_iterator(&input) {
-		line2 := strings.clone(line, mem.scratch_allocator(&scratch))
-		// all?
-		defer free(&line2, mem.scratch_allocator(&scratch))
+		line2 := line
 
 		expr, _ := strings.split_iterator(&line2, " -> ")
 		wire, _ := strings.split_iterator(&line2, " -> ")
-		ts.add_key(&sorter, wire)
+		wire2 := strings.clone(wire)
+		ts.add_key(&sorter, wire2)
 
 		fst, _ := strings.split_iterator(&expr, " ")
 		snd, snd_ok := strings.split_iterator(&expr, " ")
@@ -58,9 +52,11 @@ main :: proc() {
 			if sig_ok {
 				v^ = Signal(sig)
 			} else {
-				v^ = Wire(strings.clone(fst))
+				s := strings.clone(fst)
+				ts.add_dependency(&sorter, wire2, s)
+				v^ = Wire(s)
 			}
-			ast[wire] = v^
+			ast[wire2] = v^
 			continue
 		}
 		thr, thr_ok := strings.split_iterator(&expr, " ")
@@ -73,10 +69,10 @@ main :: proc() {
 				v^ = Signal(sig)
 			} else {
 				s := strings.clone(snd)
-				ts.add_dependency(&sorter, s, wire)
+				ts.add_dependency(&sorter, wire2, s)
 				v^ = Wire(s)
 			}
-			ast[wire] = Not {
+			ast[wire2] = Not {
 				v = v,
 			}
 			continue
@@ -89,7 +85,7 @@ main :: proc() {
 		} else {
 			s := strings.clone(fst)
 			lv^ = Wire(s)
-			ts.add_dependency(&sorter, s, wire)
+			ts.add_dependency(&sorter, wire2, s)
 		}
 		rsig, rsig_ok := strconv.parse_int(thr)
 		rv := new(Val)
@@ -98,7 +94,7 @@ main :: proc() {
 		} else {
 			s := strings.clone(thr)
 			rv^ = Wire(s)
-			ts.add_dependency(&sorter, s, wire)
+			ts.add_dependency(&sorter, wire2, s)
 		}
 		v := new(Val)
 		switch snd {
@@ -123,20 +119,19 @@ main :: proc() {
 				l = lv,
 			}
 		}
-		ast[wire] = v^
+		ast[wire2] = v^
 	}
 	sorted, cycled := ts.sort(&sorter)
 	assert(len(cycled) == 0)
-	result := 0
 	for key in &sorted {
-		fmt.println(key)
 		ast[key] = leaf(&ast, key)
 	}
-	fmt.println(ast)
+	// fmt.println(ast)
+	fmt.println(ast["a"])
 }
 leaf :: proc(ast: ^Ast, key: string) -> Signal {
 	val := ast[key]
-	#partial switch v in val {
+	switch v in val {
 	case Signal:
 		return v
 	case Wire:
