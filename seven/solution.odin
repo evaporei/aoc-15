@@ -28,7 +28,6 @@ Or :: distinct Binary
 RShift :: distinct Binary
 LShift :: distinct Binary
 Ast :: map[Wire]Val
-MAX_LINE_SIZE :: 18
 main :: proc() {
 	input := #load("input", string)
 	ast := make(Ast)
