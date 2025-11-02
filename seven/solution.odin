@@ -1,5 +1,6 @@
 package seven
 import ts "core:container/topological_sort"
+import "core:mem"
 import "core:strconv"
 
 import "core:fmt"
@@ -35,8 +36,13 @@ main :: proc() {
 	sorter: ts.Sorter(string)
 	ts.init(&sorter)
 
+	// TODO: use stack
+	scratch: mem.Scratch
+	mem.scratch_init(&scratch, size_of(rune) * MAX_LINE_SIZE * 2)
 	for line in strings.split_lines_iterator(&input) {
-		line2 := line
+		line2 := strings.clone(line, mem.scratch_allocator(&scratch))
+		// all?
+		defer free(&line2, mem.scratch_allocator(&scratch))
 
 		expr, _ := strings.split_iterator(&line2, " -> ")
 		wire, _ := strings.split_iterator(&line2, " -> ")
