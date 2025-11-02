@@ -41,6 +41,7 @@ LShift :: struct {
 MAX_LINE_SIZE :: 18
 main :: proc(){
     input := #load("example", string)
+    ast := make(map[Wire]Val)
     // TODO: use stack
     scratch: mem.Scratch
     mem.scratch_init(&scratch, size_of(rune) * MAX_LINE_SIZE * 2)
@@ -51,18 +52,19 @@ main :: proc(){
 
         expr, _ := strings.split_iterator(&line2, " -> ")
         wire, _ := strings.split_iterator(&line2, " -> ")
-        fmt.println("wire:",wire,", expr:",expr)
 
         fst, _ := strings.split_iterator(&expr, " ")
         snd, snd_ok := strings.split_iterator(&expr, " ")
         if !snd_ok {
             // signal or wire
             sig, sig_ok := strconv.parse_int(fst)
+            v := new(Val)
             if sig_ok {
-                fmt.println("just signal",sig)
+                v^ = Signal(sig)
             } else {
-                fmt.println("just wire", fst)
+                v^ = Wire(strings.clone(fst))
             }
+            ast[wire] = v^
             continue
         }
         thr, thr_ok := strings.split_iterator(&expr, " ")
@@ -70,35 +72,41 @@ main :: proc(){
             // unary
             assert(fst == "NOT")
             sig, sig_ok := strconv.parse_int(snd)
+            v := new(Val)
             if sig_ok {
-                fmt.println("~",sig)
+                v^ = Signal(sig)
             } else {
-                fmt.println("~", snd)
+                v^ = Wire(strings.clone(snd))
             }
+            ast[wire] = Not{v = v}
             continue
         }
         // binary
         lsig, lsig_ok := strconv.parse_int(fst)
-        rsig, rsig_ok := strconv.parse_int(thr)
+        lv := new(Val)
         if lsig_ok {
-            fmt.print(lsig)
+            lv^ = Signal(lsig)
         } else {
-            fmt.print( fst)
+            lv^ = Wire(strings.clone(fst))
         }
+        rsig, rsig_ok := strconv.parse_int(thr)
+        rv := new(Val)
+        if rsig_ok {
+            rv^ = Signal(rsig)
+        } else {
+            rv^ = Wire(strings.clone(thr))
+        }
+        v:=new(Val)
         switch snd {
         case "AND":
-            fmt.print(" & ")
+            v^=And{r=rv,l=lv}
         case "OR":
-            fmt.print(" | ")
+            v^=Or{r=rv,l=lv}
         case "RSHIFT":
-            fmt.print(" >> ")
+            v^=RShift{r=rv,l=lv}
         case "LSHIFT":
-            fmt.print(" << ")
+            v^=LShift{r=rv,l=lv}
         }
-        if rsig_ok {
-            fmt.println(rsig)
-        } else {
-            fmt.println( thr)
-        }
+        ast[wire]=v^
     }
 }
