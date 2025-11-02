@@ -1,9 +1,8 @@
 package seven
-import ts "core:container/topological_sort"
-import "core:mem"
-import "core:strconv"
 
+import ts "core:container/topological_sort"
 import "core:fmt"
+import "core:strconv"
 import "core:strings"
 
 Signal :: u16
@@ -36,17 +35,13 @@ main :: proc() {
 	sorter: ts.Sorter(string)
 	ts.init(&sorter)
 
-	// TODO: use stack
-	scratch: mem.Scratch
-	mem.scratch_init(&scratch, size_of(rune) * MAX_LINE_SIZE * 2)
 	for line in strings.split_lines_iterator(&input) {
-		line2 := strings.clone(line, mem.scratch_allocator(&scratch))
-		// all?
-		defer free(&line2, mem.scratch_allocator(&scratch))
+		line2 := line
 
 		expr, _ := strings.split_iterator(&line2, " -> ")
 		wire, _ := strings.split_iterator(&line2, " -> ")
-		wire2 := strings.clone(wire)
+
+		wire2 := wire
 		ts.add_key(&sorter, wire2)
 
 		fst, _ := strings.split_iterator(&expr, " ")
