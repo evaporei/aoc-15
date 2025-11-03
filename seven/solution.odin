@@ -35,13 +35,12 @@ main :: proc() {
 	ts.init(&sorter)
 
 	for line in strings.split_lines_iterator(&input) {
-		line2 := line
+		line := line
 
-		expr, _ := strings.split_iterator(&line2, " -> ")
-		wire, _ := strings.split_iterator(&line2, " -> ")
+		expr, _ := strings.split_iterator(&line, " -> ")
+		wire, _ := strings.split_iterator(&line, " -> ")
 
-		wire2 := wire
-		ts.add_key(&sorter, wire2)
+		ts.add_key(&sorter, wire)
 
 		fst, _ := strings.split_iterator(&expr, " ")
 		snd, snd_ok := strings.split_iterator(&expr, " ")
@@ -53,10 +52,10 @@ main :: proc() {
 				v^ = Signal(sig)
 			} else {
 				s := strings.clone(fst)
-				ts.add_dependency(&sorter, wire2, s)
+				ts.add_dependency(&sorter, wire, s)
 				v^ = Wire(s)
 			}
-			ast[wire2] = v^
+			ast[wire] = v^
 			continue
 		}
 		thr, thr_ok := strings.split_iterator(&expr, " ")
@@ -69,10 +68,10 @@ main :: proc() {
 				v^ = Signal(sig)
 			} else {
 				s := strings.clone(snd)
-				ts.add_dependency(&sorter, wire2, s)
+				ts.add_dependency(&sorter, wire, s)
 				v^ = Wire(s)
 			}
-			ast[wire2] = Not {
+			ast[wire] = Not {
 				v = v,
 			}
 			continue
@@ -85,7 +84,7 @@ main :: proc() {
 		} else {
 			s := strings.clone(fst)
 			lv^ = Wire(s)
-			ts.add_dependency(&sorter, wire2, s)
+			ts.add_dependency(&sorter, wire, s)
 		}
 		rsig, rsig_ok := strconv.parse_int(thr)
 		rv := new(Val)
@@ -94,7 +93,7 @@ main :: proc() {
 		} else {
 			s := strings.clone(thr)
 			rv^ = Wire(s)
-			ts.add_dependency(&sorter, wire2, s)
+			ts.add_dependency(&sorter, wire, s)
 		}
 		v := new(Val)
 		switch snd {
@@ -119,7 +118,7 @@ main :: proc() {
 				l = lv,
 			}
 		}
-		ast[wire2] = v^
+		ast[wire] = v^
 	}
 	sorted, cycled := ts.sort(&sorter)
 	assert(len(cycled) == 0)
