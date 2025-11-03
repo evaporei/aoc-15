@@ -29,7 +29,11 @@ RShift :: distinct Binary
 LShift :: distinct Binary
 Ast :: map[Wire]Val
 main :: proc() {
-	input := #load("input2", string)
+	solve(#load("input", string))
+	solve(#load("input2", string))
+}
+solve :: proc(input: string) {
+	input := input
 	ast := make(Ast)
 	sorter: ts.Sorter(string)
 	ts.init(&sorter)
