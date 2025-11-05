@@ -1,13 +1,15 @@
 let () =
   let ic = open_in "input" in
-  let rec aux acc =
+  let rec aux pt1 pt2 =
     try
       let line = input_line ic in
       let code, mem = Eight.char_counts line in
-      (* Printf.printf "The number is: %d, %d\n" code mem *)
-      aux (acc + code - mem)
+      let decoded = Eight.decode line in
+      (* Printf.printf "%d, %d, %d\n" code mem decoded; *)
+      aux (pt1 + code - mem) (pt2 + decoded - code)
     with End_of_file ->
       close_in ic;
-      acc
+      (pt1, pt2)
   in
-  Printf.printf "%d\n" (aux 0)
+  let pt1, pt2 = aux 0 0 in
+  Printf.printf "%d\n%d\n" pt1 pt2
